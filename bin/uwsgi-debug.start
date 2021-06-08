@@ -1,0 +1,11 @@
+#!/bin/sh
+# $Id$
+# Copyright (c) 2021 pocketservices GmbH
+
+
+export FLASK_CONFIG=development
+
+umask 000
+cd /var/www/chat
+uwsgi-3.8 -s /tmp/uwsgi.sock -w manage:app --master --processes 1 --threads 1 \
+      --auto-procname --thunder-lock --touch-reload reload --lazy-apps
