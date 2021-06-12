@@ -1,5 +1,6 @@
-# $Id$
-# Copyright (c) 2021 pocketservices GmbH
+#
+# Copyright (c) 2021 Benjamin Lorenz
+#
 
 from flask import jsonify, request, current_app
 from .. import mongo
@@ -68,7 +69,7 @@ def receive():
     try:
         result = mongo.db.entries.find({ 'user_id' : user_id }, { '_id' : 0 }) \
                                  .sort('timestamp', pymongo.DESCENDING) \
-                                 .limit(3)
+                                 .limit(10)
         return jsonify(list(result))
     
     except Exception as e:
