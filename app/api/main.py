@@ -6,7 +6,7 @@ from flask import jsonify, request, current_app
 from .. import mongo
 from . import api
 from .errors import ApiError, bad_request, unauthorized, forbidden
-from datetime import datetime
+import datetime
 import json
 import pymongo
 
@@ -62,14 +62,29 @@ def receive():
 
     try:
         user_id = request.args.get('user_id')
+        day = int(request.args.get('day'))
+        month = int(request.args.get('month'))
 
     except:
         pass
 
     try:
-        result = mongo.db.entries.find({ 'user_id' : user_id }, { '_id' : 0 }) \
-                                 .sort('timestamp', pymongo.DESCENDING) \
-                                 .limit(10)
+        try: [day, month]
+        except NameError:
+            result = mongo.db.entries.find({ 'user_id' : user_id }, { '_id' : 0 }) \
+                                     .sort('timestamp', pymongo.DESCENDING) \
+                                     .limit(10)
+        else:
+            expr = { '$expr' :
+                     { '$and' : [
+                         { '$eq' : [ '$user_id', user_id ] },
+                         { '$eq' : [ { '$dayOfMonth' : '$timestamp' }, day ] },
+                         { '$eq' : [ { '$month' : '$timestamp' }, month ] }
+                     ]}
+                    }
+            result = mongo.db.entries.find(expr, { '_id' : 0 }) \
+                                     .sort('timestamp', pymongo.DESCENDING) \
+                                     .limit(50)
         return jsonify(list(result))
     
     except Exception as e:
@@ -91,7 +106,7 @@ def send():
 
     try:
         result = mongo.db.entries.insert_one(
-            { 'user_id' : user_id, 'timestamp' : datetime.now(),
+            { 'user_id' : user_id, 'timestamp' : datetime.datetime.now(datetime.timezone.utc),
               'entry' : entry, 'is_encrypted' : is_encrypted })
         return jsonify({ 'result' : 'OK', 'inserted' : str(result.inserted_id) })
 
