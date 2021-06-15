@@ -1,5 +1,6 @@
-# $Id$
-# Copyright (c) 2021 pocketservices GmbH
+#
+# Copyright (c) 2021 Benjamin Lorenz
+#
 
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))

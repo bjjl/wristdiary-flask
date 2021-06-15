@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2021 Benjamin Lorenz
+#
+
 from flask import jsonify
 from app.exceptions import ValidationError
 from . import api

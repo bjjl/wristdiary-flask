@@ -1,6 +1,5 @@
 #!/bin/sh
-# $Id$
-# Copyright (c) 2021 pocketservices GmbH
+# Copyright (c) 2021 Benjamin Lorenz
 
 curl -G \
     --header "Content-Type: application/json" \

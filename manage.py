@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.8
-# $Id$
-# Copyright (c) 2021 pocketservices GmbH
+# Copyright (c) 2021 Benjamin Lorenz
+#
 
 import os
 from app import create_app, mongo
