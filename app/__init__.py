@@ -4,13 +4,22 @@
 
 from flask import Flask
 from flask_pymongo import PyMongo
+from flask.json import JSONEncoder
+from bson import ObjectId
 from config import config
 
 
 mongo = PyMongo()
 
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return super(CustomJSONEncoder, self).default(o)
+
 def create_app(config_name):
     app = Flask(__name__)
+    app.json_encoder = CustomJSONEncoder
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 

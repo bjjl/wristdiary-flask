@@ -6,6 +6,7 @@ from flask import jsonify, request, current_app
 from .. import mongo
 from . import api
 from .errors import ApiError, bad_request, unauthorized, forbidden
+from bson import ObjectId
 import datetime
 import json
 import pymongo
@@ -71,7 +72,7 @@ def receive():
     try:
         try: [day, month]
         except NameError:
-            result = mongo.db.entries.find({ 'user_id' : user_id }, { '_id' : 0 }) \
+            result = mongo.db.entries.find({ 'user_id' : user_id }) \
                                      .sort('timestamp', pymongo.DESCENDING) \
                                      .limit(10)
         else:
@@ -82,13 +83,13 @@ def receive():
                          { '$eq' : [ { '$month' : '$timestamp' }, month ] }
                      ]}
                     }
-            result = mongo.db.entries.find(expr, { '_id' : 0 }) \
+            result = mongo.db.entries.find(expr) \
                                      .sort('timestamp', pymongo.DESCENDING) \
                                      .limit(50)
         return jsonify(list(result))
     
     except Exception as e:
-        return jsonify({ 'result' : 'Error', 'description' : str(e) })
+        return jsonify({ 'result' : 'ERROR', 'description' : str(e) })
 
 
 @api.route('/send', methods=['POST'])
@@ -111,4 +112,21 @@ def send():
         return jsonify({ 'result' : 'OK', 'inserted' : str(result.inserted_id) })
 
     except Exception as e:
-        return jsonify({ 'result' : 'Error', 'description' : str(e) })
+        return jsonify({ 'result' : 'ERROR', 'description' : str(e) })
+
+
+@api.route('/delete/<object_id>', methods=['DELETE'])
+def delete(object_id):
+    ip = request.environ.get("X-Real-IP", request.remote_addr)
+
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({ 'result' : 'ERROR', 'description' : 'user_id parameter missing' })
+
+    try:
+        result = mongo.db.entries.delete_one(
+            { '_id' : ObjectId(object_id), 'user_id' : user_id })
+        return jsonify({ 'result' : 'OK', 'deleted' : str(result.deleted_count) })
+
+    except Exception as e:
+        return jsonify({ 'result' : 'ERROR', 'description' : str(e) })
