@@ -2,7 +2,7 @@
 # Copyright (c) 2021 Benjamin Lorenz
 
 # start from the project's root directory (e.g. by running ./bin/uwsgi.start)
-uwsgi-3.8 -s /tmp/uwsgi.sock -w manage:app --master --processes 4 --threads 2 \
+uwsgi-3.8 -s /tmp/uwsgi.sock -w manage:app --master --processes 2 --threads 2 \
       --daemonize /tmp/uwsgi.log --disable-logging --auto-procname \
       --thunder-lock --umask 0022 --vacuum --touch-reload reload --lazy-apps
 sleep 5
